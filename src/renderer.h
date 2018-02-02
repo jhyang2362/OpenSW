@@ -60,7 +60,7 @@ void draw_game_gameover(void);
 //
 
 void draw_fruit_indicators(int currentLevel);
-void draw_fruit_game(int currentLevel);
+void draw_fruit_game(int currentLevel, GameFruit *gameFruit);
 
 //
 // Pellet renderering
@@ -86,8 +86,8 @@ void draw_pacman_lives(int numLives);
 //
 
 void draw_ghost(Ghost *ghost);
-//void draw_scared_ghost();
-//void draw_eyes();
+bool draw_scared_ghost(Ghost *ghost, unsigned int timeGhostScared);
+void draw_eyes(Ghost *ghost);
 
 //
 // Points rendering

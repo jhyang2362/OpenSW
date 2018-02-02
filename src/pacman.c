@@ -8,6 +8,8 @@ void pacman_init(Pacman *pacman)
 	pacman->livesLeft = 3;
 
 	pacman->missedFrames = 0;
+	pacman->godMode = false;
+	pacman->boostOn = false;
 }
 
 void pacman_level_init(Pacman *pacman)

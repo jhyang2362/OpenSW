@@ -12,8 +12,6 @@ static bool keysHeld[MAX_KEYS] = {false};
 
 static unsigned int keysPressedFrame[MAX_KEYS] = {0};
 static unsigned int keysReleasedFrame[MAX_KEYS] = {0};
-static unsigned int keysPressedFrame2[MAX_KEYS] = {0};
-static unsigned int keysReleasedFrame2[MAX_KEYS] = {0};
 
 static unsigned int curKeyFrame = 1;
 
@@ -44,24 +42,10 @@ bool dir_key_held(Direction direction)
 {
 	switch (direction)
 	{
-		case Up:    return keysHeld[SDLK_UP];
-		case Down:  return keysHeld[SDLK_DOWN];
-		case Left:  return keysHeld[SDLK_LEFT];
-		case Right: return keysHeld[SDLK_RIGHT];
-	}
-
-	printf("should never reach here\n");
-	exit(1);
-}
-
-bool dir_key_held2(Direction direction)
-{
-	switch (direction)
-	{
-		case Up:    return keysHeld[SDLK_w];
-		case Down:  return keysHeld[SDLK_s];
-		case Left:  return keysHeld[SDLK_a];
-		case Right: return keysHeld[SDLK_d];
+		case Up:    return keysHeld[SDLK_UP]    || keysHeld[SDLK_w];
+		case Down:  return keysHeld[SDLK_DOWN]  || keysHeld[SDLK_s];
+		case Left:  return keysHeld[SDLK_LEFT]  || keysHeld[SDLK_a];
+		case Right: return keysHeld[SDLK_RIGHT] || keysHeld[SDLK_d];
 	}
 
 	printf("should never reach here\n");
@@ -79,28 +63,6 @@ bool dir_pressed_now(Direction *dir)
 		if (!dir_key_held(dirs[i])) continue;
 
 		int x = frame_for_direction(dirs[i]);
-
-		if (x > highestPushed)
-		{
-			*dir = dirs[i];
-			highestPushed = x;
-		}
-	}
-
-	return highestPushed != 0;
-}
-
-bool dir_pressed_now2(Direction *dir)
-{
-	int highestPushed = 0;
-
-	Direction dirs[4] = {Up, Left, Down, Right};
-
-	for (int i = 3; i >= 0; i--)
-	{
-		if (!dir_key_held2(dirs[i])) continue;
-
-		int x = frame_for_direction2(dirs[i]);
 
 		if (x > highestPushed)
 		{
@@ -140,23 +102,10 @@ static int frame_for_direction(Direction dir)
 {
 	switch (dir)
 	{
-		case Up:    return keysPressedFrame[SDLK_UP];
-		case Down:  return keysPressedFrame[SDLK_DOWN];
-		case Left:  return keysPressedFrame[SDLK_LEFT];
-		case Right: return keysPressedFrame[SDLK_RIGHT];
-	}
-
-	printf("should never reach here\n");
-	exit(1);
-}
-static int frame_for_direction2(Direction dir)
-{
-	switch (dir)
-	{
-		case Up:    return keysPressedFrame2[SDLK_w]);
-		case Down:  return keysPressedFrame2[SDLK_s]);
-		case Left:  return keysPressedFrame2[SDLK_a]);
-		case Right: return keysPressedFrame2[SDLK_d]);
+		case Up:    return max(keysPressedFrame[SDLK_UP]   , keysPressedFrame[SDLK_w]);
+		case Down:  return max(keysPressedFrame[SDLK_DOWN] , keysPressedFrame[SDLK_s]);
+		case Left:  return max(keysPressedFrame[SDLK_LEFT] , keysPressedFrame[SDLK_a]);
+		case Right: return max(keysPressedFrame[SDLK_RIGHT], keysPressedFrame[SDLK_d]);
 	}
 
 	printf("should never reach here\n");

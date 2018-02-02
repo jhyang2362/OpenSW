@@ -13,8 +13,12 @@ bool is_valid_square(Board *board, int x, int y)
 
 bool is_tele_square(int x, int y)
 {
-	if (x == -1 && y == 14) return true;
-	else if (x == 28 && y == 14) return true;
+	if(x == -1 && y == 3) return true;
+	else if(x == -1 && y == 14) return true;
+	else if(x == -1 && y == 28) return true;
+	else if(x == 28 && y == 3) return true;
+	else if(x == 28 && y == 14) return true;
+	else if(x == 28 && y == 28) return true;
 	else return false;
 }
 

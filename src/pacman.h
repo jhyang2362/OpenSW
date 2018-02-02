@@ -26,9 +26,13 @@ typedef struct
 	int missedFrames;
 	int livesLeft;
 	int score;
+	bool godMode;
+	bool boostOn;
+	unsigned originDt;
 	Direction lastAttemptedMoveDirection;
 	MovementType movementType;
 } Pacman;
+
 
 //Initializes pacman's location, lives, score. Call at start of the game.
 void pacman_init(Pacman *pacman);

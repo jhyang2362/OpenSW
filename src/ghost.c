@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 void ghosts_init(Ghost ghosts[4])
 {
@@ -15,6 +16,8 @@ void ghosts_init(Ghost ghosts[4])
 	{
 		reset_ghost(&ghosts[i], ghosts[i].ghostType);
 	}
+
+	srand(time(NULL));
 }
 
 void reset_ghost(Ghost *ghost, GhostType type)
@@ -24,18 +27,18 @@ void reset_ghost(Ghost *ghost, GhostType type)
 	Direction dir;
 	Direction next;
 	MovementMode mode;
-
+	//
 	switch (type)
 	{
-		case Blinky: { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
-		//case Inky: { x = 12; y = 14; ox = -8; oy =  0; mode = LeavingPen; dir = Up;   next = Down; break; }
-		//case Clyde: { x = 16; y = 14; ox = -8; oy =  0; mode = Scatter; dir = Up;   next = Down; break; }
-		//case Pinky: { x = 14; y = 14; ox = -8; oy =  0; mode = Chase; dir = Down; next = Down; break; }
+		case Blinky: { x = 14; y = 11; ox = -8; oy =  0; mode = Chase; dir = Left; next = Left; break; }
+		case Inky: { x = 12; y = 14; ox = -8; oy =  0; mode = Chase; dir = Up;   next = Down; break; }
+		case Clyde: { x = 16; y = 14; ox = -8; oy =  0; mode = Chase; dir = Up;   next = Down; break; }
+		case Pinky: { x = 14; y = 14; ox = -8; oy =  0; mode = Chase; dir = Down; next = Down; break; }
 
 		//testing
-		case Inky:  { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
-		case Clyde: { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
-		case Pinky: { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
+		//case Inky:  { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
+		//case Clyde: { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
+		//case Pinky: { x = 14; y = 11; ox = -8; oy =  0; mode = Scatter; dir = Left; next = Left; break; }
 
 		default: printf("error ghost\naborting\n"); exit(1);
 	}
@@ -49,6 +52,7 @@ void reset_ghost(Ghost *ghost, GhostType type)
 	//ghost->movementMode = mode;
 	ghost->transDirection = Left;
 	ghost->nextDirection = Left;
+	ghost->isDead = false;
 }
 
 void send_to_home(Ghost *ghost, GhostType type)
@@ -69,6 +73,22 @@ void send_to_home(Ghost *ghost, GhostType type)
 
 	ghost->targetX = targetX;
 	ghost->targetY = targetY;
+}
+
+void death_send(Ghost *ghost)
+{
+	int targetX;
+	int targetY;
+
+	targetX = 13;
+	targetY = 11;
+
+	ghost->targetX = targetX;
+	ghost->targetY = targetY;
+
+	if((ghost->body.x) == 13 && (ghost->body.y == 11)) {
+		ghost->isDead = 2;
+	}
 }
 
 typedef struct
@@ -160,16 +180,25 @@ void execute_ghost_logic(Ghost *targetGhost, GhostType type, Ghost *redGhost, Pa
 
 void execute_red_logic(Ghost *redGhost, Pacman *pacman)
 {
+	// Red's Ai is random x, y
+	int rNum = rand() % 26;
+	int rNum2 = rand() % 30;
+
+	redGhost->targetX = rNum;
+	redGhost->targetY = rNum2;
+
 	// Red's AI is to set his target position to pacmans
-	redGhost->targetX = pacman->body.x;
-	redGhost->targetY = pacman->body.y;
+	//redGhost->targetX = pacman->body.x;
+	//redGhost->targetY = pacman->body.y;
+
+	if(redGhost->isDead == 1) {death_send(redGhost);}
 }
 
 void execute_pink_logic(Ghost *pinkGhost, Pacman *pacman)
 {
 	// Pinks's AI is to set his target position to pacmans, plus a few more in the distance
-	int targetOffsetX = 0;
-	int targetOffsetY = 0;
+	int targetOffsetX = 1;
+	int targetOffsetY = 1;
 
 	//use dir_xy_buggy to get 4 up AND 4 left, as per bug in original game
 	dir_xy_buggy(pacman->body.curDir, &targetOffsetX, &targetOffsetY);
@@ -179,6 +208,8 @@ void execute_pink_logic(Ghost *pinkGhost, Pacman *pacman)
 
 	pinkGhost->targetX = pacman->body.x + targetOffsetX;
 	pinkGhost->targetY = pacman->body.y + targetOffsetY;
+
+	if(pinkGhost->isDead == 1) {death_send(pinkGhost);}
 }
 
 void execute_orange_logic(Ghost *orangeGhost, Pacman *pacman)
@@ -201,6 +232,8 @@ void execute_orange_logic(Ghost *orangeGhost, Pacman *pacman)
 	{
 		send_to_home(orangeGhost, orangeGhost->ghostType);
 	}
+
+	if(orangeGhost->isDead == 1) {death_send(orangeGhost);}
 }
 
 void execute_blue_logic(Ghost *blueGhost, Ghost *redGhost, Pacman *pacman)
@@ -225,6 +258,8 @@ void execute_blue_logic(Ghost *blueGhost, Ghost *redGhost, Pacman *pacman)
 
 	blueGhost->targetX = targetX;
 	blueGhost->targetY = targetY;
+
+	if(blueGhost->isDead == 1) {death_send(blueGhost);}
 }
 
 int ghost_speed_normal(int level)

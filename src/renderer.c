@@ -236,13 +236,13 @@ void draw_fruit_indicators(int currentLevel)
 }
 
 //Draws the fruit in the middle of the level.
-void draw_fruit_game(int currentLevel)
+void draw_fruit_game(int currentLevel, GameFruit *gameFruit)
 {
 	Fruit fruit = fruit_for_level(currentLevel);
 	SDL_Surface *image = get_fruit_image(fruit);
 
 	//TODO: maybe this offset isn't the same for all fruit. Investigate
-	draw_image_coord_offset(image, 13, 19, 0, 8);
+	draw_image_coord_offset(image, gameFruit->x, gameFruit->y + 2, -5, 8);
 }
 
 //
@@ -330,7 +330,11 @@ void draw_pacman(Pacman *pacman)
 	int xOffset = pacman->body.xOffset - 4;
 	int yOffset = offset + pacman->body.yOffset - 4;
 
-	draw_image_coord_offset(pacman_ani_image(aniDir, frame), pacman->body.x, pacman->body.y, xOffset, yOffset);
+	if(!pacman->boostOn) {
+		draw_image_coord_offset(pacman_ani_image(aniDir, frame), pacman->body.x, pacman->body.y, xOffset, yOffset);
+	} else {
+		draw_image_coord_offset(pacman_ani_boost_image(aniDir, frame), pacman->body.x, pacman->body.y, xOffset, yOffset);
+	}
 }
 
 void draw_pacman_static(Pacman *pacman)
@@ -412,11 +416,64 @@ void draw_ghost(Ghost *ghost)
 	draw_image_coord_offset(image, x, y, xOffset, yOffset);
 }
 
+bool draw_scared_ghost(Ghost *ghost, unsigned int dt)
+{
+	//hangs on first image for 200ms
+	//cycles through rest of images at constant rate
+	//hangs on "plop" image for a while
+
+	unsigned int perFrame = 1000;
+
+	int numFrames = 10;
+
+	SDL_Surface *image;
+
+	if(dt < numFrames * perFrame) {
+		if((dt/500) % 2 == 0){
+			image = scared_ghost_image(0);
+		} else {
+			image = scared_ghost_image(1);
+		}
+	} else {
+		return false;
+	}
+
+	int x = ghost->body.x;
+	int y = ghost->body.y + Y_OFFSET;
+
+	int xOffset = ghost->body.xOffset - 6;
+	int yOffset = ghost->body.yOffset - 6;
+
+	draw_image_coord_offset(image, x, y, xOffset, yOffset);
+	return true;
+}
+
+void draw_eyes(Ghost *ghost) {
+	//ghost dead
+	SDL_Surface *image = ghost_eye_image(ghost->body.curDir);
+
+	int x = ghost->body.x;
+	int y = ghost->body.y + Y_OFFSET;
+
+	int xOffset = ghost->body.xOffset - 6;
+	int yOffset = ghost->body.yOffset - 6;
+
+	draw_image_coord_offset(image, x, y, xOffset, yOffset);
+}
+
 //
 // Points rendering
 //
 
 void draw_fruit_pts(GameFruit *gameFruit)
+{
+	Fruit f = gameFruit->fruit;
+	SDL_Surface *image = get_fruit_score_image(f);
+
+	draw_image_coord(image, gameFruit->x, gameFruit->y + 3);
+}
+
+void draw_ghost_pts(GameFruit *gameFruit)
 {
 	Fruit f = gameFruit->fruit;
 	SDL_Surface *image = get_fruit_score_image(f);
