@@ -1,15 +1,10 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
+                
 
+Pacman
+======
 
-Hi there! Welcome to AWS Cloud9!
+Faithful clone of the original 1980 Pacman game, written in C using SDL.
 
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
+![Screenshot](http://i.imgur.com/XTNAsTa.png)
 
-Happy coding!
-
+![Screenshot](http://i.imgur.com/4phwgId.png)
