@@ -32,7 +32,7 @@ typedef struct
 {
 	GameState gameState;
 	unsigned int ticksSinceModeChange;
-	Pacman pacman;
+	Pacman pacman[2];
 	Ghost ghosts[4];
 	Board board;
 	PelletHolder pelletHolder;

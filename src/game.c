@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static void process_player(PacmanGame *game);
+static void process_player(PacmanGame *game,int pacman_num);
 static void process_fruit(PacmanGame *game);
 static void process_ghosts(PacmanGame *game);
 static void process_pellets(PacmanGame *game);
@@ -41,13 +41,14 @@ void game_tick(PacmanGame *game)
 			break;
 		case GamePlayState:
 			// everyone can move and this is the standard 'play' game mode
-			process_player(game);
+			process_player(game, 0);
+			process_player(game, 1);
 			process_ghosts(game);
 
 			process_fruit(game);
 			process_pellets(game);
 
-			if (game->pacman.score > game->highscore) game->highscore = game->pacman.score;
+			if (game->pacman[0].score > game->highscore) game->highscore = game->pacman[0].score;
 
 			break;
 		case WinState:
@@ -84,7 +85,7 @@ void game_tick(PacmanGame *game)
 
 	bool allPelletsEaten = game->pelletHolder.numLeft == 0;
 	bool collidedWithGhost = check_pacghost_collision(game);
-	int lives = game->pacman.livesLeft;
+	int lives = game->pacman[0].livesLeft;
 
 	switch (game->gameState)
 	{
@@ -94,7 +95,7 @@ void game_tick(PacmanGame *game)
 			break;
 		case LevelBeginState:
 			if (dt > 1800) enter_state(game, GamePlayState);
-			game->pacman.godMode = false;
+			game->pacman[0].godMode = false;
 
 			break;
 		case GamePlayState:
@@ -137,10 +138,10 @@ void game_render(PacmanGame *game)
 
 	//common stuff that is rendered in every mode:
 	// 1up + score, highscore, base board, lives, small pellets, fruit indicators
-	draw_common_oneup(true, game->pacman.score);
+	draw_common_oneup(true, game->pacman[0].score);
 	draw_common_highscore(game->highscore);
 
-	draw_pacman_lives(game->pacman.livesLeft);
+	draw_pacman_lives(game->pacman[0].livesLeft);
 
 	draw_small_pellets(&game->pelletHolder);
 	draw_fruit_indicators(game->currentLevel);
@@ -162,7 +163,7 @@ void game_render(PacmanGame *game)
 			draw_game_ready();
 
 			//we also draw pacman and ghosts (they are idle currently though)
-			draw_pacman_static(&game->pacman);
+			draw_pacman_static(&game->pacman[0]);
 			for (int i = 0; i < 4; i++) draw_ghost(&game->ghosts[i]);
 
 			draw_large_pellets(&game->pelletHolder, false);
@@ -185,9 +186,9 @@ void game_render(PacmanGame *game)
 			if (game->gameFruit5.eaten && ticks_game() - game->gameFruit5.eatenAt < 2000) draw_fruit_pts(&game->gameFruit5);
 
 
-			draw_pacman(&game->pacman);
+			draw_pacman(&game->pacman[0]);
 
-			if(game->pacman.godMode == false) {
+			if(game->pacman[0].godMode == false) {
 				for (int i = 0; i < 4; i++) {
 					if(game->ghosts[i].isDead == 1) {
 						draw_eyes(&game->ghosts[i]);
@@ -197,10 +198,10 @@ void game_render(PacmanGame *game)
 
 			} else {
 				if(godChange == false) {
-					game->pacman.originDt = ticks_game();
+					game->pacman[0].originDt = ticks_game();
 					godChange = true;
 				}
-				godDt = ticks_game() - game->pacman.originDt;
+				godDt = ticks_game() - game->pacman[0].originDt;
 				for (int i = 0; i < 4; i++) {
 					if(game->ghosts[i].isDead == 1) {
 						draw_eyes(&game->ghosts[i]);
@@ -210,7 +211,7 @@ void game_render(PacmanGame *game)
 							draw_ghost(&game->ghosts[i]);
 						}
 					} else {
-						game->pacman.godMode = false;
+						game->pacman[0].godMode = false;
 						godChange = false;
 						if(game->ghosts[i].isDead == 2)
 							game->ghosts[i].isDead = 0;
@@ -219,7 +220,7 @@ void game_render(PacmanGame *game)
 			}
 			break;
 		case WinState:
-			draw_pacman_static(&game->pacman);
+			draw_pacman_static(&game->pacman[0]);
 
 			if (dt < 2000)
 			{
@@ -240,14 +241,14 @@ void game_render(PacmanGame *game)
 				//draw everything normally
 
 				//TODO: this actually draws the last frame pacman was on when he died
-				draw_pacman_static(&game->pacman);
+				draw_pacman_static(&game->pacman[0]);
 
 				for (int i = 0; i < 4; i++) draw_ghost(&game->ghosts[i]);
 			}
 			else
 			{
 				//draw the death animation
-				draw_pacman_death(&game->pacman, dt - 1000);
+				draw_pacman_death(&game->pacman[0], dt - 1000);
 			}
 
 			draw_large_pellets(&game->pelletHolder, true);
@@ -267,7 +268,7 @@ static void enter_state(PacmanGame *game, GameState state)
 	switch (game->gameState)
 	{
 		case GameBeginState:
-			game->pacman.livesLeft--;
+			game->pacman[0].livesLeft--;
 
 			break;
 		case WinState:
@@ -279,7 +280,7 @@ static void enter_state(PacmanGame *game, GameState state)
 			// Player died and is starting a new game, subtract a life
 			if (state == LevelBeginState)
 			{
-				game->pacman.livesLeft--;
+				game->pacman[0].livesLeft--;
 				pacdeath_init(game);
 			}
 		default: ; //do nothing
@@ -334,9 +335,9 @@ bool can_move(Pacman *pacman, Board *board, Direction dir)
 	return is_valid_square(board, newX, newY) || is_tele_square(newX, newY);
 }
 
-static void process_player(PacmanGame *game)
+static void process_player(PacmanGame *game , int pacman_num)
 {
-	Pacman *pacman = &game->pacman;
+	Pacman *pacman = &game->pacman[pacman_num];
 	Board *board = &game->board;
 
 	if (pacman->missedFrames != 0)
@@ -350,7 +351,7 @@ static void process_player(PacmanGame *game)
 	Direction newDir;
 
 	//키 눌린게 있으면 true 반환됨
-	bool dirPressed = dir_pressed_now(&newDir);
+	bool dirPressed = dir_pressed_now(&newDir,pacman_num);
 
 	if (dirPressed)
 	{
@@ -467,7 +468,7 @@ static void process_ghosts(PacmanGame *game)
 		if (result == NewSquare)
 		{
 			//if they are in a new tile, rerun their target update logic
-			execute_ghost_logic(g, g->ghostType, &game->ghosts[0], &game->pacman);
+			execute_ghost_logic(g, g->ghostType, &game->ghosts[0], &game->pacman[0]);
 
 			g->nextDirection = next_direction(g, &game->board);
 		}
@@ -525,7 +526,7 @@ static void process_fruit(PacmanGame *game)
 	unsigned int f4dt = ticks_game() - f4->startedAt;
 	unsigned int f5dt = ticks_game() - f5->startedAt;
 
-	Pacman *pac = &game->pacman;
+	Pacman *pac = &game->pacman[0];
 
 	if (f1->fruitMode == Displaying)
 	{
@@ -605,15 +606,15 @@ static void process_pellets(PacmanGame *game)
 		//skip if we've eaten this one already
 		if (p->eaten) continue;
 
-		if (collides_obj(&game->pacman.body, p->x, p->y))
+		if (collides_obj(&game->pacman[0].body, p->x, p->y))
 		{
 			holder->numLeft--;
 
 			p->eaten = true;
-			game->pacman.score += pellet_points(p);
+			game->pacman[0].score += pellet_points(p);
 			if(pellet_check(p)) {
-				game->pacman.godMode = true;
-				game->pacman.originDt = ticks_game();
+				game->pacman[0].godMode = true;
+				game->pacman[0].originDt = ticks_game();
 				for(j = 0; j< 4; j++) {
 					if(game->ghosts[j].isDead == 2)
 						game->ghosts[j].isDead = 0;
@@ -624,7 +625,7 @@ static void process_pellets(PacmanGame *game)
 
 			//eating a small pellet makes pacman not move for 1 frame
 			//eating a large pellet makes pacman not move for 3 frames
-			game->pacman.missedFrames = pellet_nop_frames(p);
+			game->pacman[0].missedFrames = pellet_nop_frames(p);
 
 			//can only ever eat 1 pellet in a frame, so return
 			return;
@@ -648,8 +649,8 @@ static bool check_pacghost_collision(PacmanGame *game)
 		}
 		*/
 
-		if (collides(&game->pacman.body, &g->body)) {
-			if(game->pacman.godMode == false)
+		if (collides(&game->pacman[0].body, &g->body)) {
+			if(game->pacman[0].godMode == false)
 				return true;
 			else {
 				if(g->isDead == 2) {return true;}
@@ -666,7 +667,7 @@ void gamestart_init(PacmanGame *game)
 {
 	level_init(game);
 
-	pacman_init(&game->pacman);
+	pacman_init(&game->pacman[0]);
 	//we need to reset all fruit
 	//fuit_init();
 	game->highscore = 0; //TODO maybe load this in from a file..?
@@ -680,7 +681,7 @@ void gamestart_init(PacmanGame *game)
 void level_init(PacmanGame *game)
 {
 	//reset pacmans position
-	pacman_level_init(&game->pacman);
+	pacman_level_init(&game->pacman[0]);
 
 	//reset pellets
 	pellets_init(&game->pelletHolder);
@@ -699,7 +700,7 @@ void level_init(PacmanGame *game)
 
 void pacdeath_init(PacmanGame *game)
 {
-	pacman_level_init(&game->pacman);
+	pacman_level_init(&game->pacman[0]);
 	ghosts_init(game->ghosts);
 
 	reset_fruit(&game->gameFruit1, &game->board);

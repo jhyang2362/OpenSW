@@ -38,21 +38,34 @@ void handle_keyup(int keycode)
 	keysHeld[keycode] = false;
 }
 
-bool dir_key_held(Direction direction)
+bool dir_key_held(Direction direction, int pacman_num)
 {
-	switch (direction)
+	if (pacman_num == 0)
 	{
-		case Up:    return keysHeld[SDLK_UP]    || keysHeld[SDLK_w];
-		case Down:  return keysHeld[SDLK_DOWN]  || keysHeld[SDLK_s];
-		case Left:  return keysHeld[SDLK_LEFT]  || keysHeld[SDLK_a];
-		case Right: return keysHeld[SDLK_RIGHT] || keysHeld[SDLK_d];
+		switch (direction)
+		{
+		case Up:    return keysHeld[SDLK_w];
+		case Down:  return keysHeld[SDLK_s];
+		case Left:  return keysHeld[SDLK_a];
+		case Right: return keysHeld[SDLK_d];
+		}
+	}
+	else
+	{
+		switch (direction)
+		{
+		case Up:    return keysHeld[SDLK_UP];
+		case Down:  return keysHeld[SDLK_DOWN];
+		case Left:  return keysHeld[SDLK_LEFT];
+		case Right: return keysHeld[SDLK_RIGHT];
+		}
 	}
 
 	printf("should never reach here\n");
 	exit(1);
 }
 
-bool dir_pressed_now(Direction *dir)
+bool dir_pressed_now(Direction *dir, int pacman_num)
 {
 	int highestPushed = 0;
 
@@ -60,7 +73,7 @@ bool dir_pressed_now(Direction *dir)
 
 	for (int i = 3; i >= 0; i--)
 	{	//dir_key_held 가 false 면 그냥 continue해서 넘어감
-		if (!dir_key_held(dirs[i])) continue;
+		if (!dir_key_held(dirs[i], pacman_num)) continue;
 
 		//true 일때. 즉 눌렸을떄. frame return
 		int x = frame_for_direction(dirs[i]);
