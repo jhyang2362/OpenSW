@@ -18,7 +18,7 @@ void handle_keyup(int keycode);
 
 //Returns true if the current direction is currently pressed down.
 //A direction can be bound to multiple keypressed, making this function input-method agnostic.
-bool dir_key_held(Direction direction);
+bool dir_key_held(Direction direction,int pacman_num);
 
 //This function sets the input direction to the last direction that was pressed and is still currently pressed.
 //If no direction is pressed, the input direction is not assigned to.
