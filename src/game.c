@@ -86,6 +86,7 @@ void game_tick(PacmanGame *game)
 	bool allPelletsEaten = game->pelletHolder.numLeft == 0;
 	bool collidedWithGhost = check_pacghost_collision(game);
 	int lives = game->pacman[0].livesLeft;
+	int lives = game->pacman[1].livesLeft;
 
 	switch (game->gameState)
 	{
@@ -143,6 +144,7 @@ void game_render(PacmanGame *game)
 
 	draw_pacman_lives(game->pacman[0].livesLeft);
 
+
 	draw_small_pellets(&game->pelletHolder);
 	draw_fruit_indicators(game->currentLevel);
 
@@ -164,6 +166,7 @@ void game_render(PacmanGame *game)
 
 			//we also draw pacman and ghosts (they are idle currently though)
 			draw_pacman_static(&game->pacman[0]);
+			draw_pacman_static(&game->pacman[1]);
 			for (int i = 0; i < 4; i++) draw_ghost(&game->ghosts[i]);
 
 			draw_large_pellets(&game->pelletHolder, false);
@@ -187,6 +190,7 @@ void game_render(PacmanGame *game)
 
 
 			draw_pacman(&game->pacman[0]);
+			draw_pacman(&game->pacman[1]);
 
 			if(game->pacman[0].godMode == false) {
 				for (int i = 0; i < 4; i++) {
