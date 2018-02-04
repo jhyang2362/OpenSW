@@ -86,7 +86,7 @@ void game_tick(PacmanGame *game)
 	bool allPelletsEaten = game->pelletHolder.numLeft == 0;
 	bool collidedWithGhost = check_pacghost_collision(game);
 	int lives = game->pacman[0].livesLeft;
-	int lives = game->pacman[1].livesLeft;
+	
 
 	switch (game->gameState)
 	{
