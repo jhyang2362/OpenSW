@@ -24,7 +24,7 @@ bool dir_key_held(Direction direction,int pacman_num);
 //If no direction is pressed, the input direction is not assigned to.
 //If multiple directions were pressed at the same time-instance, this function prioritises Up, Left, Down, Right.
 //It returns true to indicate a direction is currently pressed, and false if no direction is pressed.
-bool dir_pressed_now(Direction *direction);
+bool dir_pressed_now(Direction *direction, int pacman_num);
 
 //Tests if a particular key is pressed. Uses the SDLK keycode constants.
 bool key_held(int key);
