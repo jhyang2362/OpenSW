@@ -97,6 +97,7 @@ void game_tick(PacmanGame *game)
 		case LevelBeginState:
 			if (dt > 1800) enter_state(game, GamePlayState);
 			game->pacman[0].godMode = false;
+			game->pacman[1].godMode = false;
 
 			break;
 		case GamePlayState:
@@ -140,6 +141,7 @@ void game_render(PacmanGame *game)
 	//common stuff that is rendered in every mode:
 	// 1up + score, highscore, base board, lives, small pellets, fruit indicators
 	draw_common_oneup(true, game->pacman[0].score);
+
 	draw_common_highscore(game->highscore);
 
 	draw_pacman_lives(game->pacman[0].livesLeft);
@@ -672,6 +674,7 @@ void gamestart_init(PacmanGame *game)
 	level_init(game);
 
 	pacman_init(&game->pacman[0]);
+	pacman_init(&game->pacman[1]);
 	//we need to reset all fruit
 	//fuit_init();
 	game->highscore = 0; //TODO maybe load this in from a file..?
@@ -686,6 +689,7 @@ void level_init(PacmanGame *game)
 {
 	//reset pacmans position
 	pacman_level_init(&game->pacman[0]);
+	pacman_level_init(&game->pacman[1]);
 
 	//reset pellets
 	pellets_init(&game->pelletHolder);
@@ -705,6 +709,7 @@ void level_init(PacmanGame *game)
 void pacdeath_init(PacmanGame *game)
 {
 	pacman_level_init(&game->pacman[0]);
+	pacman_level_init(&game->pacman[1]);
 	ghosts_init(game->ghosts);
 
 	reset_fruit(&game->gameFruit1, &game->board);
