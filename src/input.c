@@ -59,19 +59,20 @@ bool dir_pressed_now(Direction *dir)
 	Direction dirs[4] = {Up, Left, Down, Right};
 
 	for (int i = 3; i >= 0; i--)
-	{
+	{	//dir_key_held 가 false 면 그냥 continue해서 넘어감
 		if (!dir_key_held(dirs[i])) continue;
 
+		//true 일때. 즉 눌렸을떄. frame return
 		int x = frame_for_direction(dirs[i]);
 
-		if (x > highestPushed)
+		if (x > highestPushed)//x가 더 크면 highestpushed에 넣음
 		{
 			*dir = dirs[i];
 			highestPushed = x;
 		}
 	}
 
-	return highestPushed != 0;
+	return highestPushed != 0;//그래서 눌린게 없으면 false 있으면 true반환 되겠지
 }
 
 bool key_held(int keycode)

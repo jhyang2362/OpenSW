@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
+//여기에 있네 BOARD_LENGTH 랑 HEIGHT
 #define BOARD_LENGTH 28
 #define BOARD_HEIGHT 31
 

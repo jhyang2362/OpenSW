@@ -32,7 +32,8 @@ void load_board(Board *board, PelletHolder *pelletHolder, const char* file)
 		// Be wary of this when editing this code.
 
 		SDL_Surface *image = NULL;
-
+		
+		//이 switch 문에서 숫자에 따라 image 를 넣어줌
 		switch (c)
 		{
 			case '0': image = double_corner_image(BottomLeft);  break;

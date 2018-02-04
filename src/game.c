@@ -28,6 +28,7 @@ void game_tick(PacmanGame *game)
 {
 	unsigned dt = ticks_game() - game->ticksSinceModeChange;
 
+	//여기서 게임 BeginState 랑 LevelBeginState 만들 수 있을듯.
 	switch (game->gameState)
 	{
 		case GameBeginState:
@@ -348,6 +349,7 @@ static void process_player(PacmanGame *game)
 
 	Direction newDir;
 
+	//키 눌린게 있으면 true 반환됨
 	bool dirPressed = dir_pressed_now(&newDir);
 
 	if (dirPressed)
